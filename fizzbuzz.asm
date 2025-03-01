@@ -14,17 +14,6 @@ bytes_written QWORD ?
 
 .code
 main proc
-    ; Debug: print "start"
-    sub rsp, 28h
-    lea rdx, start_msg
-    mov rcx, std_out_handle
-    mov r8, sizeof start_msg -1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-    ; End Debug
-
     push rbp
     mov rbp, rsp
     and rsp, -10h
@@ -32,32 +21,12 @@ main proc
     mov rcx, -11
     call GetStdHandle
     mov std_out_handle, rax
-    
+
+    ; Debug: print "start"
     sub rsp, 28h
     lea rdx, start_msg
-    mov rcx, rax
+    mov rcx, std_out_handle
     mov r8, sizeof start_msg - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-
-    ; Debug: print rsi
-    sub rsp, 32
-    mov rax, 1
-    call convert_to_string
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline
-    mov r8, sizeof newline - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
@@ -74,6 +43,26 @@ loop_start:
     xor rdx, rdx
     mov rbx, 15
     div rbx
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline ; 仮
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    sub rsp, 32
+    mov rax, rdx
+    call convert_to_string
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+    ; End Debug
     cmp rdx, 0
     je print_fizzbuzz
 
@@ -81,6 +70,26 @@ loop_start:
     xor rdx, rdx
     mov rbx, 3
     div rbx
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline ; 仮
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    sub rsp, 32
+    mov rax, rdx
+    call convert_to_string
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+    ; End Debug
     cmp rdx, 0
     je print_fizz
 
@@ -88,12 +97,42 @@ loop_start:
     xor rdx, rdx
     mov rbx, 5
     div rbx
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline ; 仮
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    sub rsp, 32
+    mov rax, rdx
+    call convert_to_string
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+    ; End Debug
     cmp rdx, 0
     je print_buzz
 
     jmp print_number
 
 print_fizzbuzz:
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, fizzbuzz_str
+    mov r8, sizeof fizzbuzz_str -1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+
     sub rsp, 28h
     mov rcx, std_out_handle
     lea rdx, fizzbuzz_str
@@ -105,6 +144,16 @@ print_fizzbuzz:
     jmp print_newline
 
 print_fizz:
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, fizz_str
+    mov r8, sizeof fizz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+
     sub rsp, 28h
     mov rcx, std_out_handle
     lea rdx, fizz_str
@@ -116,6 +165,16 @@ print_fizz:
     jmp print_newline
 
 print_buzz:
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, buzz_str
+    mov r8, sizeof buzz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+
     sub rsp, 28h
     mov rcx, std_out_handle
     lea rdx, buzz_str
@@ -127,6 +186,16 @@ print_buzz:
     jmp print_newline
 
 print_number:
+    ; Debug
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline ; 仮
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+
     sub rsp, 32
     mov rax, rsi
     call convert_to_string
