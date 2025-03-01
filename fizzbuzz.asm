@@ -2,6 +2,7 @@
 extrn ExitProcess: proc
 extrn GetStdHandle: proc
 extrn WriteConsoleA: proc
+extrn GetLastError: proc
 
 .data
 fizz_str BYTE "Fizz", 0
@@ -16,13 +17,12 @@ bytes_written QWORD ?
 main proc
     push rbp
     mov rbp, rsp
-    and rsp, -10h
+    sub rsp, 32
 
-    mov rcx, -11
+    mov rcx, 11
     call GetStdHandle
     mov std_out_handle, rax
 
-    ; Debug: print "start"
     sub rsp, 28h
     lea rdx, start_msg
     mov rcx, std_out_handle
@@ -31,7 +31,6 @@ main proc
     push 0
     call WriteConsoleA
     add rsp, 28h
-    ; End Debug
 
     mov rsi, 1
 
@@ -43,26 +42,6 @@ loop_start:
     xor rdx, rdx
     mov rbx, 15
     div rbx
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline ; 仮
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-    sub rsp, 32
-    mov rax, rdx
-    call convert_to_string
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-    ; End Debug
     cmp rdx, 0
     je print_fizzbuzz
 
@@ -70,26 +49,6 @@ loop_start:
     xor rdx, rdx
     mov rbx, 3
     div rbx
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline ; 仮
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-    sub rsp, 32
-    mov rax, rdx
-    call convert_to_string
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-    ; End Debug
     cmp rdx, 0
     je print_fizz
 
@@ -97,105 +56,24 @@ loop_start:
     xor rdx, rdx
     mov rbx, 5
     div rbx
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline ; 仮
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-    sub rsp, 32
-    mov rax, rdx
-    call convert_to_string
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-    ; End Debug
     cmp rdx, 0
     je print_buzz
 
     jmp print_number
 
 print_fizzbuzz:
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, fizzbuzz_str
-    mov r8, sizeof fizzbuzz_str -1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, fizzbuzz_str
-    mov r8, sizeof fizzbuzz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
+    call write_fizzbuzz
     jmp print_newline
 
 print_fizz:
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, fizz_str
-    mov r8, sizeof fizz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, fizz_str
-    mov r8, sizeof fizz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
+    call write_fizz
     jmp print_newline
 
 print_buzz:
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, buzz_str
-    mov r8, sizeof buzz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, buzz_str
-    mov r8, sizeof buzz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
+    call write_buzz
     jmp print_newline
 
 print_number:
-    ; Debug
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline ; 仮
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-
     sub rsp, 32
     mov rax, rsi
     call convert_to_string
@@ -208,16 +86,10 @@ print_number:
     call WriteConsoleA
     add rsp, 32
 
-print_newline:
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
+    jmp print_newline
 
+print_newline:
+    call write_newline
     inc rsi
     jmp loop_start
 
@@ -226,6 +98,69 @@ loop_end:
     pop rbp
     mov rcx, 0
     call ExitProcess
+
+write_fizzbuzz proc
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, fizzbuzz_str
+    mov r8, sizeof fizzbuzz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ret
+write_fizzbuzz endp
+
+write_fizz proc
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, fizz_str
+    mov r8, sizeof fizz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ret
+write_fizz endp
+
+write_buzz proc
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, buzz_str
+    mov r8, sizeof buzz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ret
+write_buzz endp
+
+write_newline proc
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ret
+write_newline endp
+
+write_number proc
+    sub rsp, 32
+    mov rax, rsi
+    call convert_to_string
+
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+    ret
+write_number endp
 
 convert_to_string proc
     sub rsp, 32
