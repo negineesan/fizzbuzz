@@ -19,18 +19,18 @@ main proc
     mov rbp, rsp
     sub rsp, 32
 
-    mov rcx, 11
+    mov rcx, -11
     call GetStdHandle
     mov std_out_handle, rax
 
-    sub rsp, 28h
+    sub rsp, 32
     lea rdx, start_msg
     mov rcx, std_out_handle
     mov r8, sizeof start_msg - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 28h
+    add rsp, 32
 
     mov rsi, 1
 
@@ -100,50 +100,50 @@ loop_end:
     call ExitProcess
 
 write_fizzbuzz proc
-    sub rsp, 28h
+    sub rsp, 32
     mov rcx, std_out_handle
     lea rdx, fizzbuzz_str
     mov r8, sizeof fizzbuzz_str - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 28h
+    add rsp, 32
     ret
 write_fizzbuzz endp
 
 write_fizz proc
-    sub rsp, 28h
+    sub rsp, 32
     mov rcx, std_out_handle
     lea rdx, fizz_str
     mov r8, sizeof fizz_str - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 28h
+    add rsp, 32
     ret
 write_fizz endp
 
 write_buzz proc
-    sub rsp, 28h
+    sub rsp, 32
     mov rcx, std_out_handle
     lea rdx, buzz_str
     mov r8, sizeof buzz_str - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 28h
+    add rsp, 32
     ret
 write_buzz endp
 
 write_newline proc
-    sub rsp, 28h
+    sub rsp, 32
     mov rcx, std_out_handle
     lea rdx, newline
     mov r8, sizeof newline - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 28h
+    add rsp, 32
     ret
 write_newline endp
 
