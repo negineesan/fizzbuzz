@@ -1,1 +1,1 @@
-Cline + Gemini2.0 Pro Experimental0205 supported robataro
+Cline + Gemini2.0 Pro Experimental0205 supported robotaro
