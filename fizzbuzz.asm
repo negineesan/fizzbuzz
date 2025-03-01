@@ -14,16 +14,25 @@ bytes_written QWORD ?
 
 .code
 main proc
+    ; Debug: print "start"
+    sub rsp, 28h
+    lea rdx, start_msg
+    mov rcx, std_out_handle
+    mov r8, sizeof start_msg -1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ; End Debug
+
     push rbp
     mov rbp, rsp
     and rsp, -10h
 
-    ; Get standard output handle
     mov rcx, -11
     call GetStdHandle
     mov std_out_handle, rax
     
-    ; print start message
     sub rsp, 28h
     lea rdx, start_msg
     mov rcx, rax
@@ -33,19 +42,69 @@ main proc
     call WriteConsoleA
     add rsp, 28h
 
-    mov rsi, 1      ; rsiをループカウンタとして設定
+    ; Debug: print rsi
+    sub rsp, 32
+    mov rax, 1
+    call convert_to_string
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    ; End Debug
+
+    mov rsi, 1
 
 loop_start:
     cmp rsi, 101
     jge loop_end
 
     mov rax, rsi
-    mov rdx, 0
+    xor rdx, rdx
+    mov rbx, 15
+    div rbx
+    cmp rdx, 0
+    je print_fizzbuzz
+
+    mov rax, rsi
+    xor rdx, rdx
     mov rbx, 3
     div rbx
     cmp rdx, 0
-    jne check_buzz
-    
+    je print_fizz
+
+    mov rax, rsi
+    xor rdx, rdx
+    mov rbx, 5
+    div rbx
+    cmp rdx, 0
+    je print_buzz
+
+    jmp print_number
+
+print_fizzbuzz:
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, fizzbuzz_str
+    mov r8, sizeof fizzbuzz_str - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+    jmp print_newline
+
+print_fizz:
     sub rsp, 28h
     mov rcx, std_out_handle
     lea rdx, fizz_str
@@ -56,14 +115,7 @@ loop_start:
     add rsp, 28h
     jmp print_newline
 
-check_buzz:
-    mov rax, rsi
-    mov rdx, 0
-    mov rbx, 5
-    div rbx
-    cmp rdx, 0
-    jne check_fizzbuzz
-
+print_buzz:
     sub rsp, 28h
     mov rcx, std_out_handle
     lea rdx, buzz_str
@@ -74,39 +126,18 @@ check_buzz:
     add rsp, 28h
     jmp print_newline
 
-check_fizzbuzz:
-    mov rax, rsi
-    mov rdx, 0
-    mov rbx, 15
-    div rbx
-    cmp rdx, 0
-    jne print_number
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, fizzbuzz_str
-    mov r8, sizeof fizzbuzz_str - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
-    jmp print_number ; test
-
 print_number:
-    sub rsp, 32                 ; convert_to_string呼び出し前に領域確保（align維持）
-    
-    mov rax, rsi                ; rsiの数値をraxに移動
-    call convert_to_string      ; 文字列(RAX)とその長さ(RCX)で返る
+    sub rsp, 32
+    mov rax, rsi
+    call convert_to_string
 
-    ; rax文字列の先頭ポインタ、rcxに長さ
-    mov rdx, rax                ; rdxに文字列アドレスをセット（WriteConsoleA用）
-    mov r8, rcx                 ; r8に文字列長さをセット（WriteConsoleA用）
-    mov rcx, std_out_handle     ; 標準出力のハンドル
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    
-    add rsp, 32                 ; スタック復元
+    add rsp, 32
 
 print_newline:
     sub rsp, 28h
@@ -127,15 +158,13 @@ loop_end:
     mov rcx, 0
     call ExitProcess
 
-; 入力：raxに整数（符号なし）
-; 出力：raxに文字列先頭ポインタ、rcxに文字列長
 convert_to_string proc
-    sub rsp, 32                ; 文字列バッファを確保
-    mov rdi, rsp               ; スタックトップを文字列の先頭に設定
-    mov rcx, 0                 ; 長さ初期化
+    sub rsp, 32
+    mov rdi, rsp
+    mov rcx, 0
 
     mov rbx, 10
-    test rax, rax              ; raxが0なら特別処理
+    test rax, rax
     jnz convert_loop
     mov byte ptr [rdi], '0'
     mov rcx, 1
@@ -161,8 +190,7 @@ copy_loop:
     jnz copy_loop
 
 convert_done:
-    mov rax, rdi ; raxに文字列の先頭アドレスをセットして返す
-    ; rcxに文字列の長さをセットして返す
+    mov rax, rdi
     ret
 convert_to_string endp
 
