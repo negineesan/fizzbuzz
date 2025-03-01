@@ -23,41 +23,18 @@ main proc
     call GetStdHandle
     mov std_out_handle, rax
 
-    sub rsp, 32
     lea rdx, start_msg
     mov rcx, std_out_handle
     mov r8, sizeof start_msg - 1
     lea r9, bytes_written
     push 0
     call WriteConsoleA
-    add rsp, 32
 
     mov rsi, 1
 
 loop_start:
     cmp rsi, 101
     jge loop_end
-
-    ; Debug
-    sub rsp, 32
-    mov rax, rsi
-    call convert_to_string
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-
-    sub rsp, 28h
-    mov rcx, std_out_handle
-    lea rdx, newline
-    mov r8, sizeof newline - 1
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 28h
 
     mov rax, rsi
     xor rdx, rdx
@@ -193,7 +170,6 @@ convert_loop:
     test rax,rax
     jnz convert_loop
 
-    ; 文字列順序を反転する
     mov rax, rdi
     lea rbx, [rdi+rcx-1]
 reverse_loop:
@@ -208,22 +184,7 @@ reverse_loop:
     jmp reverse_loop
 
 convert_done:
-    ; Debug
-    push rax
-    push rcx
-    sub rsp, 32
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-    pop rcx
-    pop rax
-
-    mov rax, rsp
-    ; rcxは既に文字列長を指しているのでセット不要
+    mov rcx, rcx
     ret
 convert_to_string endp
 
