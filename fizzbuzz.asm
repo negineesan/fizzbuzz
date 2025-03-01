@@ -12,6 +12,7 @@ newline BYTE 0Dh, 0Ah, 0
 start_msg BYTE "Start_FizzBuzz...", 0Dh, 0Ah, 0
 std_out_handle QWORD ?
 bytes_written QWORD ?
+buffer BYTE 12 DUP(0)
 
 .code
 main proc
@@ -151,14 +152,15 @@ write_number endp
 
 convert_to_string proc
     sub rsp, 32
-    mov rdi, rsp
+    lea rdi, buffer
     mov rcx, 0
 
     mov rbx, 10
     test rax, rax
     jnz convert_loop
     mov byte ptr [rdi], '0'
-    mov rcx, 1
+    inc rcx
+    mov rax, rdi
     jmp convert_done
 
 convert_loop:
@@ -184,6 +186,8 @@ reverse_loop:
     jmp reverse_loop
 
 convert_done:
+    mov byte ptr [rdi+rcx], 0
+    mov rax, rdi
     mov rcx, rcx
     ret
 convert_to_string endp
