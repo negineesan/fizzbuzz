@@ -38,6 +38,27 @@ loop_start:
     cmp rsi, 101
     jge loop_end
 
+    ; Debug
+    sub rsp, 32
+    mov rax, rsi
+    call convert_to_string
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+
+    sub rsp, 28h
+    mov rcx, std_out_handle
+    lea rdx, newline
+    mov r8, sizeof newline - 1
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 28h
+
     mov rax, rsi
     xor rdx, rdx
     mov rbx, 15
@@ -74,18 +95,7 @@ print_buzz:
     jmp print_newline
 
 print_number:
-    sub rsp, 32
-    mov rax, rsi
-    call convert_to_string
-
-    mov rdx, rax
-    mov r8, rcx
-    mov rcx, std_out_handle
-    lea r9, bytes_written
-    push 0
-    call WriteConsoleA
-    add rsp, 32
-
+    call write_number
     jmp print_newline
 
 print_newline:
@@ -175,26 +185,45 @@ convert_to_string proc
     jmp convert_done
 
 convert_loop:
-    xor rdx, rdx
+    xor rdx,rdx
     div rbx
     add dl, '0'
-    push rdx
+    mov [rdi+rcx], dl
     inc rcx
-    test rax, rax
+    test rax,rax
     jnz convert_loop
 
-    mov r8, rcx
-    mov rdx, rdi
-
-copy_loop:
-    pop rax
-    mov [rdx], al
-    inc rdx
-    dec r8
-    jnz copy_loop
+    ; 文字列順序を反転する
+    mov rax, rdi
+    lea rbx, [rdi+rcx-1]
+reverse_loop:
+    cmp rdi,rbx
+    jge convert_done
+    mov dl,[rdi]
+    mov dh,[rbx]
+    mov [rdi],dh
+    mov [rbx],dl
+    inc rdi
+    dec rbx
+    jmp reverse_loop
 
 convert_done:
-    mov rax, rdi
+    ; Debug
+    push rax
+    push rcx
+    sub rsp, 32
+    mov rdx, rax
+    mov r8, rcx
+    mov rcx, std_out_handle
+    lea r9, bytes_written
+    push 0
+    call WriteConsoleA
+    add rsp, 32
+    pop rcx
+    pop rax
+
+    mov rax, rsp
+    ; rcxは既に文字列長を指しているのでセット不要
     ret
 convert_to_string endp
 
