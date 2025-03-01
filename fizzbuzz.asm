@@ -141,8 +141,8 @@ write_number proc
     call convert_to_string
 
     mov rdx, rax
-    mov r8, rcx
     mov rcx, std_out_handle
+    mov r8, r10
     lea r9, bytes_written
     push 0
     call WriteConsoleA
@@ -151,6 +151,7 @@ write_number proc
 write_number endp
 
 convert_to_string proc
+    push rcx
     sub rsp, 32
     lea rdi, buffer
     mov rcx, 0
@@ -188,7 +189,8 @@ reverse_loop:
 convert_done:
     mov byte ptr [rdi+rcx], 0
     mov rax, rdi
-    mov rcx, rcx
+    mov r10, rcx
+    pop rcx
     ret
 convert_to_string endp
 

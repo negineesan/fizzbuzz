@@ -1,2 +1,10 @@
 fizzbuzz/x64/Debug/
 x64/Debug/
+fizzbuzz/x64/Release/
+x64/Release/
+*.exe
+*.obj
+*.pdb
+*.tlog
+output.txt
+run.ps1
