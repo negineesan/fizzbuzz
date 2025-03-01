@@ -248,14 +248,14 @@ convert_loop:
     test rax, rax
     jnz convert_loop
 
-    mov rsi, rcx
+    mov r8, rcx
     mov rdx, rdi
 
 copy_loop:
     pop rax
     mov [rdx], al
     inc rdx
-    dec rsi
+    dec r8
     jnz copy_loop
 
 convert_done:
